@@ -1,10 +1,9 @@
 import chromadb
 
-from ingestion.loader import load_documents
-from ingestion.cleaner import clean_documents
 from ingestion.chunker import chunk_documents
+from ingestion.cleaner import clean_documents
 from ingestion.embedder import embed_chunks
-
+from ingestion.loader import load_documents
 
 CHROMA_PATH = "chroma_db"
 COLLECTION_NAME = "rag_documents"
@@ -65,5 +64,5 @@ def ingest_documents():
 if __name__ == "__main__":
     count = ingest_documents()
 
-    print(f"Ingestion completed successfully.")
+    print("Ingestion completed successfully.")
     print(f"Chunks stored: {count}")

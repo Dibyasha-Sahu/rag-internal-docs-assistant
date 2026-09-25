@@ -2,7 +2,6 @@ import chromadb
 
 from app.rag.embeddings import embed_text
 
-
 CHROMA_PATH = "chroma_db"
 COLLECTION_NAME = "rag_documents"
 DEFAULT_TOP_K = 5

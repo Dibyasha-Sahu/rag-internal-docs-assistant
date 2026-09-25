@@ -1,4 +1,4 @@
-from ingestion.cleaner import clean_text, clean_documents
+from ingestion.cleaner import clean_documents, clean_text
 
 
 def test_clean_text_removes_extra_whitespace():

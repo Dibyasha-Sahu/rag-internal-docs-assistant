@@ -1,4 +1,4 @@
-from ingestion.chunker import chunk_text, chunk_documents
+from ingestion.chunker import chunk_documents, chunk_text
 
 
 def test_chunk_text_creates_expected_chunks():

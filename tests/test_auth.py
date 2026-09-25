@@ -1,7 +1,6 @@
-import app.auth
-
 from fastapi import HTTPException
 
+import app.auth
 from app.auth import verify_api_key
 
 

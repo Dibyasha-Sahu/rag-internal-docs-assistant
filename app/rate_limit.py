@@ -2,7 +2,6 @@ import time
 
 from fastapi import HTTPException, Request
 
-
 RATE_LIMIT = 5
 WINDOW_SECONDS = 60
 

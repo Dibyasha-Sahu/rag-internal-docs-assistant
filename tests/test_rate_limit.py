@@ -1,6 +1,6 @@
-import app.rate_limit
-
 from fastapi import HTTPException
+
+import app.rate_limit
 
 
 class FakeClient:

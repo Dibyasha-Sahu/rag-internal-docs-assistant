@@ -5,7 +5,6 @@ from groq import Groq
 
 from app.rag.prompts import build_prompt
 
-
 load_dotenv()
 
 

@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 DOCUMENTS_DIR = Path("documents")
 
 
