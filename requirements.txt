@@ -1,2 +1,8 @@
 fastapi
 uvicorn[standard]
+sentence-transformers
+chromadb
+groq
+python-dotenv
+streamlit
+prometheus-client
