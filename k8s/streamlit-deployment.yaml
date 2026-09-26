@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-assistant-streamlit
+  namespace: rag-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-assistant-streamlit
+  template:
+    metadata:
+      labels:
+        app: rag-assistant-streamlit
+    spec:
+      containers:
+        - name: streamlit
+          image: ghcr.io/dibyasha-sahu/rag-internal-docs-assistant:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8501
+          command:
+            - streamlit
+            - run
+            - ui/streamlit_app.py
+            - --server.address=0.0.0.0
+            - --server.port=8501
+          env:
+            - name: API_URL
+              value: "http://rag-assistant-api:8000/query"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8501
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8501
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8501
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

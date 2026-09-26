@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-assistant-api
+  namespace: rag-assistant
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: rag-assistant-api
+
+  template:
+    metadata:
+      labels:
+        app: rag-assistant-api
+
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/dibyasha-sahu/rag-internal-docs-assistant:latest
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8000
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rag-assistant-secret
+                  key: API_KEY
+
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rag-assistant-secret
+                  key: GROQ_API_KEY
+
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: rag-assistant-config
+                  key: ENVIRONMENT
+
+            - name: CHROMA_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: rag-assistant-config
+                  key: CHROMA_PATH
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+
+          volumeMounts:
+            - name: chroma-storage
+              mountPath: /app/chroma_db
+
+      volumes:
+        - name: chroma-storage
+          persistentVolumeClaim:
+            claimName: rag-assistant-chroma-pvc

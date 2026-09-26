@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rag-assistant-ingestion
+  namespace: rag-assistant
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: rag-assistant-ingestion
+    spec:
+      restartPolicy: Never
+
+      containers:
+        - name: ingestion
+          image: ghcr.io/dibyasha-sahu/rag-internal-docs-assistant:latest
+          imagePullPolicy: Always
+
+          command:
+            - python
+            - -m
+            - ingestion.ingest
+
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "3Gi"
+
+          volumeMounts:
+            - name: chroma-storage
+              mountPath: /app/chroma_db
+
+      volumes:
+        - name: chroma-storage
+          persistentVolumeClaim:
+            claimName: rag-assistant-chroma-pvc

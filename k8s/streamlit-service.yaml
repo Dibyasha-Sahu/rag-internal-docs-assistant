@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rag-assistant-streamlit
+  namespace: rag-assistant
+spec:
+  selector:
+    app: rag-assistant-streamlit
+  ports:
+    - protocol: TCP
+      port: 8501
+      targetPort: 8501
+  type: ClusterIP
