@@ -3,6 +3,11 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
+from app.metrics import (
+    COMPLETION_TOKENS,
+    PROMPT_TOKENS,
+    TOTAL_TOKENS,
+)
 from app.rag.prompts import build_prompt
 
 load_dotenv()
@@ -23,6 +28,11 @@ def generate_answer(query, context):
         ],
         temperature=0,
     )
+
+    if response.usage:
+        PROMPT_TOKENS.inc(response.usage.prompt_tokens)
+        COMPLETION_TOKENS.inc(response.usage.completion_tokens)
+        TOTAL_TOKENS.inc(response.usage.total_tokens)
 
     answer = response.choices[0].message.content
 

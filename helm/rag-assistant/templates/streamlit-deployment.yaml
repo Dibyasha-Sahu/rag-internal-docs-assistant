@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-assistant-streamlit
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.streamlit.replicaCount }}
+  selector:
+    matchLabels:
+      app: rag-assistant-streamlit
+  template:
+    metadata:
+      labels:
+        app: rag-assistant-streamlit
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+
+      containers:
+        - name: streamlit
+          image: "{{ .Values.streamlit.image.repository }}:{{ .Values.streamlit.image.tag }}"
+          imagePullPolicy: {{ .Values.streamlit.image.pullPolicy }}
+          command:
+            - streamlit
+            - run
+            - ui/streamlit_app.py
+            - --server.address=0.0.0.0
+            - --server.port=8501
+          ports:
+            - containerPort: 8501
+          env:
+            - name: API_URL
+              value: "http://rag-assistant-api:8000/query"
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rag-assistant-secret
+                  key: API_KEY
+          resources:
+{{ toYaml .Values.streamlit.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8501
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8501
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8501
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

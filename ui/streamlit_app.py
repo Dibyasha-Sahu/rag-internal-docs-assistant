@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-API_URL = "http://api:8000/query"
+API_URL = os.getenv("API_URL", "http://api:8000/query")
 API_KEY = os.getenv("API_KEY")
 
 

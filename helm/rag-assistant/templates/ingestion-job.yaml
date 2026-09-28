@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rag-assistant-ingestion
+  namespace: {{ .Values.namespace }}
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: rag-assistant-ingestion
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: ingestion
+          image: "{{ .Values.ingestion.image.repository }}:{{ .Values.ingestion.image.tag }}"
+          imagePullPolicy: {{ .Values.ingestion.image.pullPolicy }}
+          command:
+            - python
+            - -m
+            - ingestion.ingest
+          resources:
+{{ toYaml .Values.ingestion.resources | nindent 12 }}
+          volumeMounts:
+            - name: chroma-storage
+              mountPath: /app/chroma_db
+      volumes:
+        - name: chroma-storage
+          persistentVolumeClaim:
+            claimName: rag-assistant-chroma-pvc

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rag-assistant-config
+  namespace: {{ .Values.namespace }}
+data:
+  ENVIRONMENT: "{{ .Values.config.environment }}"
+  CHROMA_PATH: "{{ .Values.config.chromaPath }}"
