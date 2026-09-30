@@ -5,7 +5,7 @@ api:
   image:
     repository: ghcr.io/dibyasha-sahu/rag-internal-docs-assistant
     tag: latest
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   service:
     type: ClusterIP
     port: 8000

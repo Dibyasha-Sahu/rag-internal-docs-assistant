@@ -5,7 +5,7 @@ from fastapi.responses import Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from app.auth import verify_api_key
-from app.metrics import REQUEST_COUNT, REQUEST_LATENCY
+from app.metrics import ERROR_COUNT, REQUEST_COUNT, REQUEST_LATENCY
 from app.rag.context import build_context
 from app.rag.generator import generate_answer
 from app.rag.retriever import retrieve_documents
@@ -26,38 +26,44 @@ router = APIRouter()
 def query_documents(request: QueryRequest):
     start_time = time.time()
 
-    results = retrieve_documents(request.question, top_k=3)
+    try:
+        results = retrieve_documents(request.question, top_k=3)
 
-    context = build_context(results)
+        context = build_context(results)
 
-    generated = generate_answer(
-        request.question,
-        context,
-    )
+        generated = generate_answer(
+            request.question,
+            context,
+        )
 
-    sources = []
+        sources = []
 
-    metadatas = results.get("metadatas", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
 
-    for metadata in metadatas:
-        if metadata:
-            sources.append(
-                {
-                    "document": metadata.get("source", "unknown"),
-                    "chunk": metadata.get("chunk_id", -1),
-                }
-            )
+        for metadata in metadatas:
+            if metadata:
+                sources.append(
+                    {
+                        "document": metadata.get("source", "unknown"),
+                        "chunk": metadata.get("chunk_id", -1),
+                    }
+                )
 
-    REQUEST_COUNT.inc()
+        REQUEST_COUNT.inc()
 
-    REQUEST_LATENCY.observe(
-        time.time() - start_time
-    )
+        return QueryResponse(
+            answer=generated["answer"],
+            sources=sources,
+        )
 
-    return QueryResponse(
-        answer=generated["answer"],
-        sources=sources,
-    )
+    except Exception:
+        ERROR_COUNT.inc()
+        raise
+
+    finally:
+        REQUEST_LATENCY.observe(
+            time.time() - start_time
+        )
 
 
 @router.get("/metrics")

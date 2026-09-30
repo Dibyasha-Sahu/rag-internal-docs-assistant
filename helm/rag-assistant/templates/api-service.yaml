@@ -3,11 +3,14 @@ kind: Service
 metadata:
   name: rag-assistant-api
   namespace: {{ .Values.namespace }}
+  labels:
+    app: rag-assistant-api
 spec:
   selector:
     app: rag-assistant-api
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: {{ .Values.api.service.port }}
       targetPort: {{ .Values.api.service.targetPort }}
   type: {{ .Values.api.service.type }}

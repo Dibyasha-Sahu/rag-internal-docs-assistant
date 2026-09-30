@@ -24,3 +24,8 @@ TOTAL_TOKENS = Counter(
     "rag_total_tokens",
     "Total number of tokens used by RAG requests",
 )
+
+ERROR_COUNT = Counter(
+    "rag_error_count",
+    "Total number of RAG API query errors",
+)
